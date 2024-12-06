@@ -1,7 +1,7 @@
 import re,os
 from pathlib import Path
 def delate_ts():
-    os.unlink("1-11协程/异步爬取视频/ts/ts.m3u8")
+    #os.unlink("1-11协程/异步爬取视频/ts/ts.m3u8")
     if  os.listdir("1-11协程/异步爬取视频/ts"):
         for i in Path("1-11协程/异步爬取视频/ts").glob('*.ts'):
 
