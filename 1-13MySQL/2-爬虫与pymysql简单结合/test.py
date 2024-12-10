@@ -1,18 +1,20 @@
-import requests
+import requests,time,os,re,pymysql
 from lxml import etree
-headers={
-    "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-    "Referer":"https://www.xigushi.com/",
-}
-res=requests.get("https://www.xigushi.com/mrgs/15060.html",headers=headers)
-res.encoding=res.apparent_encoding
-text= res.text
+def increase_data(ls):
+    
+    db=pymysql.connect(host="127.0.0.1",user="root",password="123456",database="test")
+    db.set_charset("utf8")
+    cursor=db.cursor()
+    print(cursor)
 
-selector=etree.HTML(text)
-ls=selector.xpath("//div[@class='by']")
-for i in selector:
-    title=i.xpath("./h1/text()")
-    print(title)
-#                 author=regexes.findall(i.xpath("./div/text()")[0])[0]
-#                 body=i.xpath("./p/text()")[0]
-#                 task_ls.append((title,author,body))
+    for i in range (len(ls)):
+        try :
+            cursor.execute(f"insert into xigushi values({ls[i][0]},{ls[i][1]},{ls[i][2]})")
+            db.commit()
+            print("22")
+        except:
+            db.rollback()
+            print("11")
+    db.close()
+
+increase_data([("1","2","3")])

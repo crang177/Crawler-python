@@ -1,18 +1,19 @@
-import requests,os,pymysql,asyncio,aiohttp,re
+import os,pymysql,asyncio,aiohttp,re
 from lxml import etree
 
 def increase_data(ls):
-    db=pymysql.connect(host="127.0.0.1",user="root",password="123456")
+    db=pymysql.connect(host="127.0.0.1",user="root",password="123456",database="test")
     db.set_charset("utf8")
     cursor=db.cursor()
 
     for i in range (len(ls)):
         try :
-            cursor.execute(f"insert into xigyshi values({ls[0]},{ls[1]},{ls[2]})")
+            cursor.execute(f"insert into xigushi values('{ls[i][0]}','{ls[i][1]}','{ls[i][2]}')") #  '{ls[i][0]}'用字符串一定得有个单引号（针对于字符串）
             db.commit()
         except:
             db.rollback()
     db.close()
+ 
 
 
 async def get_data_url(url):
@@ -29,15 +30,21 @@ async def get_data(url):
    
     async with aiohttp.ClientSession(headers=headers) as session:
         async with session.get(url) as res:
+           
             text=await res.text()
+
             selector=etree.HTML(text)
-            ls=selector.xpath("//dl/dd")
-            for i in selector:
-                title=i.xpath("./h1")
-                print(title)
-#                 author=regexes.findall(i.xpath("./div/text()")[0])[0]
-#                 body=i.xpath("./p/text()")[0]
-#                 task_ls.append((title,author,body))
+
+
+            ls=selector.xpath('//div[@class="by"]/dl//dd')
+            regexes=re.compile(r'时间:.*作者:(.*)? 编辑:')
+            for i in ls:
+                title=i.xpath('./h1/text()')[0]
+                author=regexes.findall(i.xpath("./div/text()")[0])[0]        
+                body_ls=i.xpath("./p/text()")
+                body=''.join(body_ls)
+                body=body.replace('\r','').replace("\n",'').replace("\u3000",'')
+                task_ls.append((title,author,body))
 
 
 
@@ -52,7 +59,7 @@ async def main():
     await get_data_url(url)
     print("爬取完成")
     print("开始写入数据")
-    #increase_data(task_ls)
+    increase_data(task_ls)
     print("数据写入完成")
     
 
@@ -65,5 +72,5 @@ if __name__=="__main__":
         "Referer":"https://www.xigushi.com/",
     }
     task_ls=[]
-    regexes=re.compile(r'时间:2019-11-19 作者:(.*)? 编辑:')
+    
     asyncio.run(main())
