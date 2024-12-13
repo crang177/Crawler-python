@@ -2,8 +2,6 @@ import redis,random
 
 from settings import *
 
-
-
 class ProxyRedis:
     def __init__(self):
 
