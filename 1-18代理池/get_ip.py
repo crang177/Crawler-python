@@ -67,7 +67,10 @@ def get_ip():
     port_ls=selector.xpath("//tbody/tr/td[2]/text()")   
     redis=ProxyRedis()
     for i in range(len(port_ls)):
+        #   构造ip（包含端口）
         ip= ip_ls[i]+":"+port_ls[i]
+
+
         #将数据存入redis中
         redis.zset_add(ip)
         print(ip,"已存入redis中")

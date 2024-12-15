@@ -1,7 +1,10 @@
+
+"""
+    测试ip
+"""
+
 import asyncio,aiohttp
 from proxy_redis import ProxyRedis
-
-
 
 async def test_ip(sem,ip,redis):
     try:
